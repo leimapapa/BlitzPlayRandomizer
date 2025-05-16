@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blitz Play Randomizer</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2451471082233132"
+     crossorigin="anonymous"></script>
+     <style>
+       body {
+      	margin: 0 auto;
+      	background: #3a3a3a;
+      	overflow: hidden;
+      }
+      .playHolder > svg {
+      	position: absolute;
+      	top: 50%;
+      	left: 50%;
+      	transform: translate(-50%, calc(-50% - 25px));
+      	height: auto;
+      	width: 100%;
+      	box-shadow: 0px -2px 5px -1px #000;
+      }
+      .newPlay {
+      	cursor: pointer;
+      }
+      .newPlay {
+      	position: fixed;
+      	bottom: 15px;
+      	right: 15px;
+      	height: 80px;
+      	width: 80px;
+      	font-family: monospace;
+      	text-transform: uppercase;
+      	background: #013212;
+      	color: #fff;
+      }
+      .playHolder {
+      	position: fixed;
+      	top: 50%;
+      	left: 50%;
+      	transform: translate(-50%, -50%);
+      	width: 350px;
+      	height: 350px;
+      	max-height: 95vh;
+      	max-width: 95vw;
+      	cursor: pointer;
+      	background-color: #363636;
+      }
+      .playName {
+      	position: absolute;
+      	width: calc(100% - 30px);
+      	top: 50%;
+      	left: 50%;
+      	transform: translate(-50%, calc(-50% + 180px));
+      	font-size: 250%;
+      	font-family: monospace;
+      	font-weight: bold;
+      	padding: 10px 15px 10px 15px;
+      	border-radius: 0px 0px 10px 10px;
+      	background: #6b398b;
+      	color: white;
+      	text-align: center;
+      	z-index: 2;
+      	text-transform: uppercase;
+      	box-shadow: 0px 2px 5px -1px #000;
+      }
+      .changing0 {
+      	animation: spinX 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1;
+      }
+      .changing1 {
+      	animation: spinY 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 1;
+      }
+      @keyframes spinX {
+      	from {
+      		transform: translate(-50%, -50%) rotateZ(0deg) rotateX(0deg);
+      	}
+      	to {
+      		transform: translate(-50%, -50%) rotateZ(-360deg) rotateX(360deg);
+      	}
+      }
+      @keyframes spinY {
+      	from {
+      		transform: translate(-50%, -50%) rotateZ(0deg) rotateY(0deg);
+      	}
+      	to {
+      		transform: translate(-50%, -50%) rotateZ(360deg) rotateY(360deg);
+      	}
+      }
+	     </style>
+	</head>
+	<body>
+	  <div class="playHolder">
+      <svg viewBox="0 0 100 100">
+      	<defs>
+      		<marker id="arrowR" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse">
+      			<path d="M 0 0 L 10 5 L 0 10 z" fill="#e31e30" />
+      		</marker>
+      		<marker id="arrowG" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3" markerHeight="3" orient="auto-start-reverse">
+      			<path d="M 0 0 L 10 5 L 0 10 z" fill="#6fc058" />
+      		</marker>
+      	</defs>
+      	<rect height="100%" width="100%" fill="#013212" />
+      	<path d="M30 0v100M70 0v100 M0 30h100M0 70h100" stroke="rgba(255,255,127,0.3)" stroke-width="0.5" fill="none" />
+      	<path class="scrimmage" d="M15 50h70" stroke="#ffab40" stroke-width="3" fill="none" />
+      	<g class="players" fill="none" stroke-width="3">
+      		<circle cx="18" cy="61" r="4" stroke="#ffe853" />
+      		<circle cx="31" cy="61" r="4" stroke="#ffe853" />
+      		<circle cx="43.5" cy="61" r="4" stroke="#ffe853" />
+      		<circle cx="56.5" cy="61" r="4" stroke="#ffe853" />
+      		<circle cx="69" cy="61" r="4" stroke="#ffe853" stroke-width="3" />
+      		<circle cx="82" cy="61" r="4" stroke="#ffe853" />
+      		<rect class="qb" x="27" y="85" height="8" width="8" stroke="#6b398b" />
+      	</g>
+      	<g class="routes" fill="none" stroke="#e31e30" marker-end="url(#arrowR)" stroke-width="3" stroke-linejoin="bevel">
+      		<path d="M56.5 54 v-20 l-15 -15" filter="drop-shadow(0 0 .5 #000)" />
+      		<path d="M69 54 v-20 l-15 -15" filter="drop-shadow(0 0 0.75 #000)" />
+      		<path d="M82 54 v-20 l-15 -15" filter="drop-shadow(0 0 1 #000)" />
+      		<path class="qbDrop" stroke="#6fc058" marker-end="url(#arrowG)" d="M31 69 v8"/>
+      	</g>
+      </svg>
+      <div class="playName">Da Bomb</div>
+    </div>
+    <button class="newPlay" title="Generate a new random play">New Play</button>
+	<script>
+	  const randInt = (min, max) => {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    function randomPlay() {
+    	let receivers = 3;
+    	let xPos = [18, 31, 43.5, 56.5, 69, 82];
+    	// where does the qb start out?
+    	let qbIndex = randInt(1,xPos.length-2);
+    	let rg = qbIndex + 1;
+    	let lg = qbIndex - 1;
+    	let routes = [];
+    	
+    	for (let i=0; i<xPos.length; i++) {
+    		let yPos = 54;
+    		document.querySelectorAll('.players > circle')[i].setAttribute('cy', 61);
+    		if (i !== qbIndex && i !== rg && i !== lg) {
+    			console.log(i);
+    			let stepBack = randInt(0,7);
+    			if (stepBack <= 2) {
+    				yPos = 58;
+    				document.querySelectorAll('.players > circle')[i].setAttribute('cy', 65);
+    			} else if (stepBack >=7) {
+    				yPos = 62;
+    				document.querySelectorAll('.players > circle')[i].setAttribute('cy', 69);
+    			}
+    			let turns = randInt(0,1);
+    			let extraTurn = turns == 0 ? `l${randInt(-15,15)} ${(Math.random() > 0.5 ? -1 : 1) * randInt(7,15)}` : '';
+    			routes.push(`M${xPos[i]} ${yPos} v${randInt(-30,-6)} L${randInt(20,80)} ${randInt(20,35)}${extraTurn}`);
+    		}
+    	}
+    	document.querySelector('.qb').setAttribute('x', xPos[qbIndex] - 4);
+    	let routesP = document.querySelectorAll('.routes > path');
+    	for (let j=0; j<routesP.length; j++) {
+    		routesP[j].setAttribute('d', routes[j]);
+    	}
+    	// dropback
+    	routesP[routesP.length-1].setAttribute('d', `M${xPos[qbIndex]} 69 v8`);
+    }
+    
+    const prefixes = {
+      other: ["Da", "Slant", "Middle", "Outside", "Inside", "Hook", "Corner", "Chaotic", "Synched", "Deep", "Super", "Wild", "Crossing", "Power", "Push", "Turbo", "Nuclear", "Ultra", "Mega", "Atomic", "Thunderous", "Stealth", "Swift", "Explosive", "Dynamic", "Fierce", "Rapid"]
+    };
+    const plays = ["Loop", "Slants", "Bomb", "Curls", "Chaos", "Corners", "Hooks", "Smash", "Lightning", "Rumble", "Jumble", "Rush", "Fury", "Thunder", "Push", "Storm", "Raid", "Charge", "Hurricane", "Impact", "Blaze", "Blast", "Whirlwind", "Firestorm", "Tornado", "Sprint", "Falcon", "Avalanche"];
+    
+    function generatePlayName() {
+    	const p = 0.01; // probability of helper being after the prefixes word
+      const categories = ["other"];
+      const category = categories[Math.floor(Math.random() * categories.length)];
+      let playPrefix = prefixes[category][Math.floor(Math.random() * prefixes[category].length)];
+    
+      // Determine if the helper should be before or after the playPrefix
+      const helperPlacement = Math.random() < p ? "before" : "after";
+      const helper = plays[Math.floor(Math.random() * plays.length)];
+    
+      // Add helper based on placement
+      if (helperPlacement === "before") {
+        playPrefix = `${helper} ${playPrefix}`;
+      } else {
+        playPrefix = `${playPrefix} ${helper}`;
+      }
+      return playPrefix;
+    }
+    
+    function newPlay() {
+    	const holder = document.querySelector('.playHolder');
+    	const playName = document.querySelector('.playName');
+      holder.classList.add(`changing${randInt(0,1)}`);
+      // change mid animation
+    	setTimeout(() => {
+        playName.textContent = generatePlayName();
+    		randomPlay();
+       }, 500);
+      holder.addEventListener("animationend", () => {
+        // Remove the changing class once the animation ends
+        holder.classList.remove("changing0");
+        holder.classList.remove("changing1");
+      }, { once: true });
+    }
+    // initial call no animation
+    randomPlay();
+    document.querySelector('.playName').textContent = generatePlayName();
+    
+    // listeners
+    document.querySelector('.newPlay').addEventListener('click', newPlay);
+    document.querySelector('.playHolder').addEventListener('click', newPlay);
+  </script>
+		<script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+    <script>
+        kofiWidgetOverlay.draw('leimapapa', {
+		'type': 'floating-chat',
+		'floating-chat.donateButton.text': 'Support me',
+		'floating-chat.donateButton.background-color': 'rgba(0, 0, 0, 0.2)',
+		'floating-chat.donateButton.text-color': '#fff'
+	});
+	</script>
+    <script type="module">
+	  import { createNavbar } from 'https://leimolabs.com/navbar.js';
+	
+	  document.addEventListener('DOMContentLoaded', () => {
+	    createNavbar({ opacity: '0.8' });
+	  });
+    </script>
+</body>
+</html>
